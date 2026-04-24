@@ -1,159 +1,90 @@
 import "./style.css";
-import { createApi } from "unsplash-js";
+import { searchPhotos } from "./components/Services/Unsplash";
+import { createHeader } from "./components/Header/Header";
+import { createGallery, renderGallery } from "./components/Gallery/Gallery";
 
-// ================= API =================
-const unsplash = createApi({
-  accessKey: import.meta.env.VITE_ACCESS_KEY,
-});
-
-// ================= STATE =================
 let currentPage = 1;
 let currentQuery = "nature";
 let isLoading = false;
 
-// ================= LOADER =================
-const loader = document.querySelector("#loader");
-
-const showLoader = () => (loader.style.display = "block");
-const hideLoader = () => (loader.style.display = "none");
-
-// ================= API =================
-const searchPhotos = async (keyword, page = 1) => {
-  return await unsplash.search.getPhotos({
-    query: keyword,
-    page,
-    perPage: 30,
-  });
+// ---------- DARK MODE ----------
+const toggleDarkMode = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
 };
 
-// ================= HEADER =================
-const headerTemplate = () => `
-  <h1>P</h1>
-
-  <input id="searchinput" placeholder="Search images..." />
-
-  <button id="searchbtn" class="icon-btn">🔍</button>
-  <button id="darkmodebtn" class="icon-btn">🌙</button>
-`;
-
-const headerListeners = () => {
-  document.querySelector("#darkmodebtn").addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-  });
+const initDarkMode = () => {
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark");
+  }
 };
 
-const printHeader = () => {
-  document.querySelector("header").innerHTML = headerTemplate();
-  headerListeners();
+// ---------- FAVORITES ----------
+const handleFavorites = () => {
+  const favs = JSON.parse(localStorage.getItem("favs")) || [];
+  renderGallery(favs, true);
 };
 
-// ================= FOOTER =================
-const footerTemplate = () => `
-  <h4>Inspirest - Pinterest Clone</h4>
-`;
-
-const printFooter = () => {
-  document.querySelector("footer").innerHTML = footerTemplate();
+// ---------- LOAD ----------
+const loadPhotos = async (query, reset = false) => {
+  const photos = await searchPhotos(query, currentPage);
+  renderGallery(photos, reset);
 };
 
-// ================= CARD PRO =================
-const cardTemplate = (item) => `
-  <li class="card"
-    style="background-image:url(${item.urls.small}); border: 10px solid ${item.color};"
-  >
+// ---------- SEARCH ----------
+const handleSearch = async (query) => {
+  if (!query.trim()) return;
 
-    <button class="save-btn">Guardar</button>
+  currentQuery = query;
+  currentPage = 1;
 
-    <div class="overlay">
-
-      <a class="link" href="${item.links.html}" target="_blank">
-        Ver
-      </a>
-
-      <a class="link" href="${item.urls.full}" target="_blank">
-        Descargar
-      </a>
-
-    </div>
-
-  </li>
-`;
-
-// ================= RENDER =================
-const printItems = (items, reset = false) => {
-  const gallery = document.querySelector(".gallery");
-
-  if (reset) gallery.innerHTML = "";
-
-  let html = "";
-  items.forEach(item => html += cardTemplate(item));
-
-  gallery.innerHTML += html;
+  await loadPhotos(query, true);
+  window.scrollTo(0, 0);
 };
 
-// ================= SEARCH =================
-const galleryListeners = () => {
-  const input = document.querySelector("#searchinput");
-  const btn = document.querySelector("#searchbtn");
+// ---------- HOME ----------
+const handleHome = async () => {
+  currentQuery = "nature";
+  currentPage = 1;
 
-  const search = async () => {
-    if (!input.value.trim()) return;
-
-    currentQuery = input.value;
-    currentPage = 1;
-
-    showLoader();
-
-    const res = await searchPhotos(currentQuery, currentPage);
-
-    hideLoader();
-
-    if (res?.response?.results) {
-      printItems(res.response.results, true);
-    }
-  };
-
-  btn.addEventListener("click", search);
-  input.addEventListener("keypress", e => e.key === "Enter" && search());
+  await loadPhotos(currentQuery, true);
 };
 
-// ================= SCROLL =================
+// ---------- SCROLL ----------
 const handleScroll = async () => {
   if (isLoading) return;
 
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
-  if (scrollTop + clientHeight >= scrollHeight - 120) {
+  if (scrollTop + clientHeight >= scrollHeight - 100) {
     isLoading = true;
     currentPage++;
 
-    const res = await searchPhotos(currentQuery, currentPage);
-
-    if (res?.response?.results) {
-      printItems(res.response.results);
-    }
+    await loadPhotos(currentQuery);
 
     isLoading = false;
   }
 };
 
-// ================= INIT =================
+// ---------- SCROLL TOP ----------
+const scrollTopBtn = document.createElement("button");
+scrollTopBtn.textContent = "⬆️";
+scrollTopBtn.className = "scroll-top";
+
+scrollTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.body.appendChild(scrollTopBtn);
+
+// ---------- INIT ----------
 const init = async () => {
-  document.querySelector("main").innerHTML = `<ul class="gallery"></ul>`;
+  initDarkMode();
 
-  printHeader();
-  printFooter();
-  galleryListeners();
+  createHeader(handleSearch, handleHome, handleFavorites, toggleDarkMode);
+  createGallery();
 
-  showLoader();
-
-  const res = await searchPhotos(currentQuery, currentPage);
-
-  hideLoader();
-
-  if (res?.response?.results) {
-    printItems(res.response.results, true);
-  }
+  await loadPhotos(currentQuery, true);
 
   window.addEventListener("scroll", handleScroll);
 };
