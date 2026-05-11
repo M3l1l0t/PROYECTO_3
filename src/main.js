@@ -7,10 +7,19 @@ let currentPage = 1;
 let currentQuery = "nature";
 let isLoading = false;
 
+// ---------- LOADER ----------
+const loader = document.getElementById("loader");
+
+const showLoader = () => (loader.style.display = "block");
+const hideLoader = () => (loader.style.display = "none");
+
 // ---------- DARK MODE ----------
 const toggleDarkMode = () => {
   document.body.classList.toggle("dark");
-  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  localStorage.setItem(
+    "darkMode",
+    document.body.classList.contains("dark")
+  );
 };
 
 const initDarkMode = () => {
@@ -27,8 +36,22 @@ const handleFavorites = () => {
 
 // ---------- LOAD ----------
 const loadPhotos = async (query, reset = false) => {
+  showLoader();
+
   const photos = await searchPhotos(query, currentPage);
+
   renderGallery(photos, reset);
+
+  hideLoader();
+};
+
+// ---------- DEBOUNCE ----------
+const debounce = (fn, delay = 500) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
 };
 
 // ---------- SEARCH ----------
@@ -39,8 +62,11 @@ const handleSearch = async (query) => {
   currentPage = 1;
 
   await loadPhotos(query, true);
-  window.scrollTo(0, 0);
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
+
+const handleSearchDebounced = debounce(handleSearch, 500);
 
 // ---------- HOME ----------
 const handleHome = async () => {
@@ -50,13 +76,12 @@ const handleHome = async () => {
   await loadPhotos(currentQuery, true);
 };
 
-// ---------- SCROLL ----------
-const handleScroll = async () => {
-  if (isLoading) return;
+// ---------- SCROLL INFINITE ----------
+const sentinel = document.createElement("div");
+document.querySelector("main").appendChild(sentinel);
 
-  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-  if (scrollTop + clientHeight >= scrollHeight - 100) {
+const observer = new IntersectionObserver(async (entries) => {
+  if (entries[0].isIntersecting && !isLoading) {
     isLoading = true;
     currentPage++;
 
@@ -64,15 +89,23 @@ const handleScroll = async () => {
 
     isLoading = false;
   }
-};
+});
+
+observer.observe(sentinel);
 
 // ---------- SCROLL TOP ----------
 const scrollTopBtn = document.createElement("button");
 scrollTopBtn.textContent = "⬆️";
 scrollTopBtn.className = "scroll-top";
+scrollTopBtn.setAttribute("aria-label", "Ir arriba");
 
 scrollTopBtn.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+window.addEventListener("scroll", () => {
+  scrollTopBtn.style.display =
+    window.scrollY > 300 ? "block" : "none";
 });
 
 document.body.appendChild(scrollTopBtn);
@@ -81,12 +114,10 @@ document.body.appendChild(scrollTopBtn);
 const init = async () => {
   initDarkMode();
 
-  createHeader(handleSearch, handleHome, handleFavorites, toggleDarkMode);
+  createHeader(handleSearchDebounced, handleHome, handleFavorites, toggleDarkMode);
   createGallery();
 
   await loadPhotos(currentQuery, true);
-
-  window.addEventListener("scroll", handleScroll);
 };
 
 init();
