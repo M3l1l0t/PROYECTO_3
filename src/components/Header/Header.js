@@ -1,4 +1,5 @@
 import "./Header.css";
+
 export const createHeader = (onSearch, onHome, onFavs, onDark) => {
   const header = document.querySelector("header");
   header.innerHTML = "";
@@ -11,15 +12,19 @@ export const createHeader = (onSearch, onHome, onFavs, onDark) => {
 
   const searchBtn = document.createElement("button");
   searchBtn.textContent = "🔍";
+  searchBtn.setAttribute("aria-label", "Buscar");
 
   const homeBtn = document.createElement("button");
   homeBtn.textContent = "🏠";
+  homeBtn.setAttribute("aria-label", "Inicio");
 
   const favBtn = document.createElement("button");
   favBtn.textContent = "⭐";
+  favBtn.setAttribute("aria-label", "Favoritos");
 
   const darkBtn = document.createElement("button");
   darkBtn.textContent = "🌙";
+  darkBtn.setAttribute("aria-label", "Modo oscuro");
 
   const nav = document.createElement("div");
   nav.className = "nav";
@@ -31,7 +36,9 @@ export const createHeader = (onSearch, onHome, onFavs, onDark) => {
   };
 
   searchBtn.addEventListener("click", handleSearch);
-  input.addEventListener("keydown", (e) => e.key === "Enter" && handleSearch());
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleSearch();
+  });
 
   homeBtn.addEventListener("click", onHome);
   favBtn.addEventListener("click", onFavs);
