@@ -3,158 +3,43 @@
   --text: #111;
   --red: #e60023;
   --soft: rgba(0,0,0,0.05);
+  --white: #fff;
 }
 
+/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* BASE */
 body {
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, sans-serif;
 }
 
+/* DARK MODE PRO (variables dinámicas) */
 .dark {
-  background: #111;
-  color: white;
-}
-
-/* ================= HEADER ================= */
-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-header h1 {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--red);
-  color: white;
-  display: grid;
-  place-items: center;
-}
-
-/* INPUT */
-header input {
-  flex: 1;
-  padding: 1rem;
-  border-radius: 999px;
-  border: none;
-  background: #eee;
-  min-width: 120px;
-}
-
-/* ICON BUTTONS */
-header button {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: none;
-  background: var(--soft);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-header button:hover {
-  transform: translateY(-2px);
-  background: rgba(0,0,0,0.12);
-}
-
-.dark header button {
-  background: rgba(255,255,255,0.1);
-}
-
-.profileimg {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+  --bg: #111;
+  --text: #fff;
+  --soft: rgba(255,255,255,0.1);
 }
 
 /* ================= GALLERY ================= */
 .gallery {
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+
   columns: 5 220px;
   column-gap: 1rem;
-  padding: 1rem;
 }
 
-/* CARD */
-.card {
-  position: relative;
-  margin-bottom: 1rem;
-  border-radius: 20px;
-  background-size: cover;
-  background-position: center;
-  break-inside: avoid;
-  height: 300px;
-  overflow: hidden;
-  transition: transform 0.2s ease;
-}
-
-.card:hover {
-  transform: scale(1.02);
-}
-
-/* SAVE BUTTON */
-.save-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-
-  padding: 0.6rem 1rem;
-  border-radius: 999px;
-
-  background: var(--red);
-  color: white;
-  border: none;
-
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.card:hover .save-btn {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.save-btn:hover {
-  background: #c4001a;
-}
-
-/* OVERLAY LINKS */
-.overlay {
-  position: absolute;
-  inset: 0;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 1rem;
-
-  background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
-
-  opacity: 0;
-  transition: 0.3s;
-}
-
-.card:hover .overlay {
-  opacity: 1;
-}
-
-.link {
-  background: rgba(255,255,255,0.9);
-  padding: 0.4rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  text-decoration: none;
-  color: black;
+.gallery li {
+  display: inline-block;
+  width: 100%;
 }
 
 /* ================= LOADER ================= */
@@ -162,12 +47,32 @@ header button:hover {
   text-align: center;
   padding: 2rem;
   display: none;
+  font-weight: bold;
 }
 
-/* ================= FOOTER ================= */
-footer {
-  text-align: center;
-  padding: 2rem;
+/* ================= SCROLL TOP ================= */
+.scroll-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  z-index: 1000;
+
+  padding: 12px;
+  border-radius: 50%;
+  border: none;
+
+  background: var(--red);
+  color: var(--white);
+
+  cursor: pointer;
+  display: none;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.scroll-top:hover {
+  transform: scale(1.1);
 }
 
 /* ================= RESPONSIVE ================= */
