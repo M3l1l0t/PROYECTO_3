@@ -1,25 +1,106 @@
 header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
+  gap: 1rem;
+  padding: 1rem;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  background: var(--bg);
+  backdrop-filter: blur(8px);
 }
 
+/* LOGO */
+header h1 {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+
+  background: var(--red);
+  color: var(--white);
+
+  display: grid;
+  place-items: center;
+
+  font-size: 18px;
+  user-select: none;
+}
+
+/* INPUT */
+header input {
+  flex: 1;
+  padding: 1rem;
+
+  border-radius: 999px;
+  border: none;
+
+  background: #eee;
+  min-width: 120px;
+
+  transition: all 0.2s ease;
+}
+
+header input:focus {
+  outline: 2px solid var(--red);
+  background: #f5f5f5;
+}
+
+/* NAV */
 .nav {
   display: flex;
   gap: 10px;
 }
 
-input {
-  padding: 8px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
+/* BOTONES */
+header button {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: var(--soft);
+  cursor: pointer;
+
+  transition: all 0.2s ease;
 }
 
-button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
+/* MICROINTERACCIONES PRO */
+header button:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(0,0,0,0.12);
+}
+
+header button:active {
+  transform: scale(0.95);
+}
+
+/* DARK MODE */
+.dark header {
+  background: rgba(17, 17, 17, 0.8);
+}
+
+.dark header button {
+  background: rgba(255,255,255,0.1);
+}
+
+.dark header input {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+/* AVATAR */
+.profileimg {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ACCESIBILIDAD */
+header button:focus {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
 }
